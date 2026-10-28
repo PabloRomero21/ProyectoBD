@@ -1,0 +1,234 @@
+@startuml
+hide methods
+skinparam classAttributeIconSize 0
+
+' --- CLASES DE PERSONAL ---
+class Policia <<entidad>> {
+  numeroIdentificacion
+  horario
+  vacacionesDisponibles
+  diasAsuntosPropios
+  horasExtra
+  refuerzosMes
+  añosAntiguedad
+}
+
+note left of Policia
+  {RN-08: Los refuerzos del mes no deben ser mayores a cinco.}
+end note
+
+class Jefe <<entidad>> {
+  fechaNombramiento
+}
+class Oficial <<entidad>> {
+  fechaNombramiento
+}
+
+Policia <|-- Jefe
+Policia <|-- Oficial
+
+note on link
+  {disjunta}
+end note
+
+' --- CLASES DE OPERATIVA Y TURNOS ---
+class GrupoTrabajo <<entidad>> {
+  nombre
+  zonaDistrito
+}
+
+class TurnoTrabajo <<entidad>> {
+  fecha
+  tipoTurno
+}
+
+note right of TurnoTrabajo::tipoTurno
+  **Tipos de turno:**
+  * **Mañana:** Turno diurno inicial.
+  * **Tarde:** Turno diurno vespertino.
+  * **Noche:** Turno nocturno.
+end note
+
+' --- CLASES DE VEHÍCULOS Y MANTENIMIENTO ---
+class Vehiculo <<entidad>> {
+  matricula
+  tipoVehiculo
+  fechaProximaITV
+  fechaProximaLimpieza
+  fechaProximoMantenimiento
+  fechaMatriculacion
+  fechaVencimientoSeguro
+}
+
+note right of Vehiculo::tipoVehiculo
+  **Tipos de vehículo:**
+  * **Moto:** Vehículo de dos ruedas.
+  * **Coche:** Patrulla estándar.
+  * **Furgón:** Furgoneta de transporte/antidisturbios.
+end note
+
+note left of Vehiculo
+  {RN-05: En registro ITV se debe cumplir la normativa española de la ITV, fijándose en la variable fechaMatriculacion.}
+  {RN-06: fechaVencimientoSeguro no puede ser una fecha pasada.}
+  {RN-07: Mínimo un alcoholímetro, una manta térmica y un desfibrilador en el vehículo.}
+end note
+
+class Registroarmeria <<entidad>>{
+  fechayhoraRetirada
+  fechayhoraDevolucion
+}
+
+note right of Registroarmeria
+  {RN-09: En registro armería no puede demorarse más de doce horas el proceso de recogida y devolución.}
+end note
+
+class RegistroITV <<entidad>>{
+  fechaYhora
+}
+class RegistroLimpieza <<entidad>>{
+  fechaYhora
+}
+
+note right of RegistroLimpieza
+  {RN-01: Las fechas de limpieza no deben distanciarse más de una semana.}
+end note
+
+class RegistroMantenimiento <<entidad>>{
+  fechaYhora
+}
+
+note right of RegistroMantenimiento
+  {RN-02: Las fechas de mantenimiento no deben distanciarse más de un mes.}
+end note
+
+class RegistroRevision <<entidad>>{
+  fechaYhora
+}
+
+note right of RegistroRevision
+  {RN-04: La revisión debe hacerse antes siempre de una práctica de tiro con un espaciado de dos semanas.}
+end note
+
+class RegistroPracticas <<entidad>>{
+  fechaYhora
+}
+
+note right of RegistroPracticas
+  {RN-03: Las fechas de prácticas no deben distanciarse más de seis meses.}
+end note
+
+class Equipamiento <<entidad>> {
+  tipoMaterial
+  numeroSerie
+}
+
+note right of Equipamiento::tipoMaterial
+  **Tipos de material:**
+  * Cono
+  * Desfibrilador
+  * Alcoholimetro
+  * Vallas
+  * EscudoAntidisturbios
+  * CascoAntidisturbios
+  * Linterna
+  * Botiquin
+  * MantasTermicas
+  * Drogotest
+  * CintaBalizamiento
+  * Emisora
+end note
+
+' --- CLASE DE ASIGNACIÓN DE VEHÍCULO EN UN TURNO ---
+class AsignacionVehiculo <<entidad>> {
+  kilometrosRecorridos
+}
+
+' Un turno de trabajo contiene una o varias asignaciones de vehículos
+TurnoTrabajo *-- "1..*" AsignacionVehiculo : incluye >
+
+' Un vehículo tiene un historial de muchas asignaciones a lo largo del tiempo
+Vehiculo "1" -- "0..*" AsignacionVehiculo : es asignado en >
+
+' Un policía tiene un historial de muchas asignaciones como piloto o copiloto
+Policia "1" -- "0..*" AsignacionVehiculo : pilota >
+Policia "0..1" -- "0..*" AsignacionVehiculo : copilota >
+
+' --- CLASES DE ARMERÍA ---
+class Arma <<entidad>> {
+  numeroSerie
+  numeroCajaAsignada
+  autorizacion
+  municionAsignada
+  fechaProximaPractica
+  fechaProximaRevision
+}
+
+' --- CLASES DE DENUNCIAS ---
+class Denuncia <<entidad>> {
+  tipo
+  horaHecho
+  normativaplicada
+  hechodenunciable
+  cuantiaeconomica
+  cuantiapenal
+  denunciado
+  revisada
+  revisor
+  graduaciondelasancion
+  viaEjecutiva
+}
+
+note right of Denuncia::tipo
+  **Tipos de denuncia:**
+  * **Administrativa**
+  * **Penal**
+end note
+
+note right of Denuncia::graduaciondelasancion
+  **Graduación de la sanción:**
+  * **Leve**
+  * **Grave**
+  * **Muy grave**
+end note
+
+note left of Denuncia
+  {RN-10: Una denuncia no puede tener una alegación hasta que no sea revisada.}
+  {RN-12: Si revisada = true, la denuncia tiene exactamente un revisor (Oficial o Jefe) y revisor identifica su numeroIdentificacion. Si revisada = false, no tiene revisor.}
+end note
+
+class Alegacion <<entidad>> {
+  fechaPresentacion
+  argumento
+}
+
+note right of Alegacion
+  {RN-11: Una alegación no puede tener más de seis meses de antigüedad.}
+end note
+
+' --- RELACIONES DE COMPOSICIÓN (*--) ---
+Arma *-- "1..*" RegistroRevision : contiene >
+Arma *-- "1..*" RegistroPracticas : contiene >
+Vehiculo *-- "1..*" RegistroITV : contiene >
+Vehiculo *-- "1..*" RegistroLimpieza : contiene >
+Vehiculo *-- "1..*" RegistroMantenimiento : contiene >
+GrupoTrabajo *-- "1..*" TurnoTrabajo : planifica >
+Vehiculo *-- "1..*" Equipamiento : integra >
+Denuncia *-- "0..*" Alegacion : recibe >
+
+' --- ASOCIACIONES SIMPLES Y CRUZADAS (--) ---
+GrupoTrabajo "1" -- "1..*" Policia : compuestoPor >
+TurnoTrabajo "1" -- "0..*" Denuncia : genera >
+Oficial "1" -- "1" GrupoTrabajo : estaACargoDe >
+Jefe "1" -- "0..*" Policia : apruebaVacacionesYHorarios >
+Policia "1" -- "0..*" Denuncia : interpone >
+Oficial "1" -- "0..*" Denuncia : revisa >
+Jefe "1" -- "0..*" Denuncia : revisa >
+note on link
+  {xor}
+end note
+Policia "1" -- "0..*" TurnoTrabajo : realiza >
+
+Policia "1" -- "1" Arma : porta >
+(Policia,Arma) .. Registroarmeria
+
+@enduml

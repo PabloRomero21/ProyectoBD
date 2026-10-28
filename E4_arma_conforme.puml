@@ -1,0 +1,28 @@
+@startuml
+hide methods
+object "p1 : Policia" as p { numeroIdentificacion = "P-201" }
+object "arma1 : Arma" as a {
+  numeroSerie = "GLK-55012"
+  numeroCajaAsignada = 14
+  autorizacion = "AUT-2024-118"
+  municionAsignada = 30
+  fechaProximaPractica = 2027-03-15
+  fechaProximaRevision = 2027-03-01
+}
+object "rev1 : RegistroRevision" as r1 { fechaYhora = 2026-05-10 09:00 }
+object "rev2 : RegistroRevision" as r2 { fechaYhora = 2026-10-05 09:00 }
+object "pr1 : RegistroPracticas" as pr1 { fechaYhora = 2026-05-20 10:00 }
+object "pr2 : RegistroPracticas" as pr2 { fechaYhora = 2026-10-15 10:00 }
+object "ra1 : Registroarmeria" as ra {
+  fechayhoraRetirada = 2026-10-28 07:00
+  fechayhoraDevolucion = 2026-10-28 15:00
+}
+
+p -- a : porta
+a *-- r1 : contiene
+a *-- r2 : contiene
+a *-- pr1 : contiene
+a *-- pr2 : contiene
+ra -- p
+ra -- a
+@enduml

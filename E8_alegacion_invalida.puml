@@ -1,0 +1,32 @@
+@startuml
+hide methods
+object "d2 : Denuncia" as d2 {
+  tipo = Administrativa
+  hechodenunciable = "Ruido nocturno"
+  revisada = false
+  graduaciondelasancion = Leve
+}
+object "al2 : Alegacion" as al2 {
+  fechaPresentacion = 2026-10-20
+  argumento = "No era mi domicilio"
+}
+object "d3 : Denuncia" as d3 {
+  tipo = Administrativa
+  hechodenunciable = "Exceso de velocidad"
+  revisada = true
+  revisor = "P-001"
+  graduaciondelasancion = Grave
+}
+object "al3 : Alegacion" as al3 {
+  fechaPresentacion = 2026-03-15
+  argumento = "Error en el cinemómetro"
+}
+object "jefe1 : Jefe" as j { numeroIdentificacion = "P-001" }
+
+d2 *-- al2 : recibe
+d3 *-- al3 : recibe
+j -- d3 : revisa
+
+note bottom of al2 : RN-10: la denuncia no está revisada
+note bottom of al3 : RN-11: antigüedad > 6 meses
+@enduml

@@ -1,0 +1,19 @@
+@startuml
+hide methods
+object "p3 : Policia" as p {
+  numeroIdentificacion = "P-215"
+  refuerzosMes = 6
+}
+object "arma3 : Arma" as a { numeroSerie = "GLK-55099" }
+object "ra2 : Registroarmeria" as ra {
+  fechayhoraRetirada = 2026-10-27 08:00
+  fechayhoraDevolucion = 2026-10-28 09:30
+}
+
+p -- a : porta
+ra -- p
+ra -- a
+
+note right of p : RN-08: refuerzosMes > 5
+note right of ra : RN-09: 25,5 h > 12 h
+@enduml

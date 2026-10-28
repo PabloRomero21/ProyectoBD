@@ -1,0 +1,32 @@
+@startuml
+hide methods
+object "t1 : TurnoTrabajo" as t {
+  fecha = 2026-09-15
+  tipoTurno = Tarde
+}
+object "p1 : Policia" as p { numeroIdentificacion = "P-201" }
+object "of1 : Oficial" as of1 { numeroIdentificacion = "P-102" }
+object "d1 : Denuncia" as d {
+  tipo = Administrativa
+  horaHecho = "17:40"
+  normativaplicada = "Ordenanza municipal de circulación"
+  hechodenunciable = "Estacionamiento indebido"
+  cuantiaeconomica = 200
+  cuantiapenal = 0
+  denunciado = "Juan Pérez López"
+  revisada = true
+  revisor = "P-102"
+  graduaciondelasancion = Grave
+  viaEjecutiva = false
+}
+object "al1 : Alegacion" as al {
+  fechaPresentacion = 2026-10-10
+  argumento = "Vehículo averiado, sin posibilidad de retirada"
+}
+
+t -- d : genera
+p -- t : realiza
+p -- d : interpone
+of1 -- d : revisa
+d *-- al : recibe
+@enduml

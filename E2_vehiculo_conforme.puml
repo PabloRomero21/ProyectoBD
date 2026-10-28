@@ -1,0 +1,31 @@
+@startuml
+hide methods
+object "v2 : Vehiculo" as v {
+  matricula = "7788-HJT"
+  tipoVehiculo = Coche
+  fechaMatriculacion = 2020-06-15
+  fechaProximaITV = 2028-06-15
+  fechaProximaLimpieza = 2026-11-03
+  fechaProximoMantenimiento = 2026-11-20
+  fechaVencimientoSeguro = 2027-01-31
+}
+object "itv1 : RegistroITV" as itv { fechaYhora = 2026-06-10 10:00 }
+object "l1 : RegistroLimpieza" as l1 { fechaYhora = 2026-10-20 08:00 }
+object "l2 : RegistroLimpieza" as l2 { fechaYhora = 2026-10-27 08:00 }
+object "m1 : RegistroMantenimiento" as m1 { fechaYhora = 2026-09-25 09:00 }
+object "m2 : RegistroMantenimiento" as m2 { fechaYhora = 2026-10-22 09:00 }
+object "e1 : Equipamiento" as e1 { tipoMaterial = Alcoholimetro }
+object "e2 : Equipamiento" as e2 { tipoMaterial = MantasTermicas }
+object "e3 : Equipamiento" as e3 { tipoMaterial = Desfibrilador }
+object "e4 : Equipamiento" as e4 { tipoMaterial = Botiquin }
+
+v *-- itv : contiene
+v *-- l1 : contiene
+v *-- l2 : contiene
+v *-- m1 : contiene
+v *-- m2 : contiene
+v *-- e1 : integra
+v *-- e2 : integra
+v *-- e3 : integra
+v *-- e4 : integra
+@enduml

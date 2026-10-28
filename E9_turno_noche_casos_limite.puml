@@ -1,0 +1,51 @@
+@startuml
+hide methods
+object "t2 : TurnoTrabajo" as t {
+  fecha = 2026-10-28
+  tipoTurno = Noche
+}
+object "a1 : AsignacionVehiculo" as a1 { kilometrosRecorridos = 45 }
+object "a2 : AsignacionVehiculo" as a2 { kilometrosRecorridos = 120 }
+object "moto1 : Vehiculo" as v1 {
+  matricula = "5566-MNP"
+  tipoVehiculo = Moto
+}
+object "furgon1 : Vehiculo" as v2 {
+  matricula = "9021-RTW"
+  tipoVehiculo = Furgón
+}
+object "p4 : Policia" as p4 { numeroIdentificacion = "P-230" }
+object "p5 : Policia" as p5 { numeroIdentificacion = "P-231" }
+object "p6 : Policia" as p6 { numeroIdentificacion = "P-232" }
+object "jefe1 : Jefe" as j { numeroIdentificacion = "P-001" }
+object "d4 : Denuncia" as d {
+  tipo = Penal
+  horaHecho = "02:15"
+  normativaplicada = "Código Penal"
+  hechodenunciable = "Conducción bajo efectos del alcohol"
+  cuantiaeconomica = 0
+  cuantiapenal = 6000
+  denunciado = "Luis Gómez Ruiz"
+  revisada = true
+  revisor = "P-001"
+  graduaciondelasancion = "Muy grave"
+  viaEjecutiva = true
+}
+
+t *-- a1 : incluye
+t *-- a2 : incluye
+v1 -- a1 : es asignado en
+v2 -- a2 : es asignado en
+p4 -- a1 : pilota
+p5 -- a2 : pilota
+p6 -- a2 : copilota
+p4 -- t : realiza
+p5 -- t : realiza
+p6 -- t : realiza
+t -- d : genera
+p4 -- d : interpone
+j -- d : revisa
+
+note bottom of a1 : Sin copiloto (0..1)
+note bottom of d : Sin alegaciones (0..*)
+@enduml

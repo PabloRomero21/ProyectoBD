@@ -1,0 +1,57 @@
+@startuml
+hide methods
+object "alfa : GrupoTrabajo" as g {
+  nombre = "Alfa"
+  zonaDistrito = "Centro"
+}
+object "of1 : Oficial" as of1 {
+  numeroIdentificacion = "P-102"
+  fechaNombramiento = 2019-03-01
+  refuerzosMes = 1
+}
+object "p1 : Policia" as p1 {
+  numeroIdentificacion = "P-201"
+  refuerzosMes = 2
+}
+object "p2 : Policia" as p2 {
+  numeroIdentificacion = "P-202"
+  refuerzosMes = 0
+}
+object "t1 : TurnoTrabajo" as t1 {
+  fecha = 2026-10-28
+  tipoTurno = Mañana
+}
+object "a1 : AsignacionVehiculo" as a1 {
+  kilometrosRecorridos = 84
+}
+object "v1 : Vehiculo" as v1 {
+  matricula = "4512-KLM"
+  tipoVehiculo = Coche
+}
+object "e1 : Equipamiento" as e1 {
+  tipoMaterial = Alcoholimetro
+  numeroSerie = "AL-0033"
+}
+object "e2 : Equipamiento" as e2 {
+  tipoMaterial = MantasTermicas
+  numeroSerie = "MT-0120"
+}
+object "e3 : Equipamiento" as e3 {
+  tipoMaterial = Desfibrilador
+  numeroSerie = "DF-0007"
+}
+
+of1 -- g : estaACargoDe
+g -- p1 : compuestoPor
+g -- p2 : compuestoPor
+g *-- t1 : planifica
+t1 *-- a1 : incluye
+v1 -- a1 : es asignado en
+p1 -- a1 : pilota
+p2 -- a1 : copilota
+p1 -- t1 : realiza
+p2 -- t1 : realiza
+v1 *-- e1 : integra
+v1 *-- e2 : integra
+v1 *-- e3 : integra
+@enduml

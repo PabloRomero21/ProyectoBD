@@ -12,6 +12,18 @@ class Policia <<entidad>> {
   refuerzosMes
   añosAntiguedad
 }
+class Ambitoadministrativo<<entidad>>{
+  tipo(adminitrativa,penal)
+  horaHecho
+  normativaplicada
+  hechodenunciable
+  cuantiaeconomica
+  cuantiapenal
+  denunciado
+  revisada
+  graduaciondelasancion(leve,grave,muygrave)
+  viaEjecutiva(voluntaria,forzosa)
+}
 
 class Jefe <<entidad>> {
   fechaNombramiento
@@ -24,13 +36,7 @@ Policia <|-- Jefe
 Policia <|-- Oficial
 
 note on link
-  {completa, disjunta}
-end note
-
-note left of Policia
-  {RN-03: Vacaciones exigen validación y aprobación del jefe.}
-  {RN-04: Asignación base de 7 días de asuntos propios.}
-  {RN-05: Días de asuntos propios aumentan por antigüedad.}
+  {disjunta}
 end note
 
 ' --- CLASES DE OPERATIVA Y TURNOS ---
@@ -39,30 +45,16 @@ class GrupoTrabajo <<entidad>> {
   zonaDistrito
 }
 
-
-note right of GrupoTrabajo
-  {RN-02: Mantener mínimo del 50% de ocupación operativa.}
-end note
-
 class TurnoTrabajo <<entidad>> {
   fecha
   tipoTurno
-
 }
 
-' 1. Definimos la enumeración con los tipos de turno
-enum tipoTurno {
-  Manana
-  Tarde
-  Noche
-}
-
-' 2. Conectamos la clase con el enum mediante una línea discontinua
-TurnoTrabajo ..> tipoTurno : especifica >
-
-note bottom of TurnoTrabajo
-  {RN-01: Ciclo inalterable de turnos: 7T-7D, 5T-5D, 2T-2D.}
-  {RN-06: Límite máximo de 5 noches de trabajo por policía.}
+note right of TurnoTrabajo::tipoTurno
+  **Tipos de turno:**
+  * **Mañana:** Turno diurno inicial.
+  * **Tarde:** Turno diurno vespertino.
+  * **Noche:** Turno nocturno.
 end note
 
 ' --- CLASES DE VEHÍCULOS Y MANTENIMIENTO ---
@@ -72,71 +64,74 @@ class Vehiculo <<entidad>> {
   fechaProximaITV
   fechaProximaLimpieza
   fechaProximoMantenimiento
+  fechaVencimientoSeguro
 }
 
-enum TipoVehiculo {
-  Moto
-  Coche
-  Furgon
-}
+note right of Vehiculo::tipoVehiculo
+  **Tipos de vehículo:**
+  * **Moto:** Vehículo de dos ruedas.
+  * **Coche:** Patrulla estándar.
+  * **Furgón:** Furgoneta de transporte/antidisturbios.
+end note
 
-' 2. Línea discontinua que conecta el Vehículo con sus posibles valores (Enumeración)
-Vehiculo ..> TipoVehiculo : define tipo >
 class Registroarmeria<<entidad>>{
   fechayhoraRetirada
   fechayhoraDevolucion
 }
 class RegistroITV <<entidad>>{
-
+  fechaYhora
 }
 class RegistroLimpieza <<entidad>>{
-
+  fechaYhora
 }
 class RegistroMantenimiento <<entidad>>{
-
+  fechaYhora
 }
 
-class RegistroRevision <<entidad>>{}
+class RegistroRevision <<entidad>>{
+  fechaYhora
+}
 
-class RegistroPracticas <<entidad>>{}
-
-note left of Vehiculo
-  {RN-07: Limpieza estricta 1 vez a la semana.}
-  {RN-08: Mantenimiento mecánico 1 vez al mes.}
-  {RN-09: Control y registro obligatorio de ITV.}
-  {RN-10: Comprobación semanal de sistemas de emergencia.}
-  {RN-11: Mínimo 1 desfibrilador y 1 alcoholímetro asignado.}
-end note
+class RegistroPracticas <<entidad>>{
+  fechaYhora
+}
 
 class Equipamiento <<entidad>> {
   tipoMaterial
   numeroSerie
 }
 
-' 1. Definimos la enumeración con todos tus materiales
-enum TipoMaterialEquipamiento {
-  Cono
-  Desfibrilador
-  Alcoholimetro
-  Vallas
-  EscudoAntidisturbios
-  CascoAntidisturbios
-  Linterna
-  Botiquin
-  MantasTermicas
-  Drogotest
-  CintaBalizamiento
-  Emisora
-}
+note right of Equipamiento::tipoMaterial
+  **Tipos de material:**
+  * Cono
+  * Desfibrilador
+  * Alcoholimetro
+  * Vallas
+  * EscudoAntidisturbios
+  * CascoAntidisturbios
+  * Linterna
+  * Botiquin
+  * MantasTermicas
+  * Drogotest
+  * CintaBalizamiento
+  * Emisora
+end note
 
-' 2. Conectamos la clase con el enum mediante una línea discontinua
-Equipamiento ..> TipoMaterialEquipamiento : especifica >
-
-class AsignacionTurnoVehiculo <<entidad>> {
+' --- CLASE DE ASIGNACIÓN DE VEHÍCULO EN UN TURNO ---
+class AsignacionVehiculo <<entidad>> {
   kilometrosRecorridos
-  piloto
-  copiloto
 }
+
+' Un turno de trabajo contiene una o varias asignaciones de vehículos
+TurnoTrabajo *-- "1..*" AsignacionVehiculo : incluye >
+
+' Un vehículo tiene un historial de muchas asignaciones a lo largo del tiempo
+Vehiculo "1" -- "0..*" AsignacionVehiculo : es asignado en >
+
+' Un policía tiene un historial de muchas asignaciones como piloto o copiloto
+Policia "1" -- "0..*" AsignacionVehiculo : pilota >
+Policia "0..1" -- "0..*" AsignacionVehiculo : copilota >
+
 ' --- CLASES DE ARMERÍA ---
 class Arma <<entidad>> {
   numeroSerie
@@ -146,14 +141,6 @@ class Arma <<entidad>> {
   fechaProximaPractica
   fechaProximaRevision
 }
-
-note right of Arma
-  {RN-12: Mínimo 1 práctica de tiro registrada al año.}
-  {RN-13: Práctica llevada a cabo únicamente por policía asignado.}
-  {RN-14: Revisión técnica 1 vez al mes con técnico especializado.}
-end note
-
-
 
 ' --- CLASES DE DENUNCIAS ---
 class Denuncia <<entidad>> {
@@ -167,11 +154,6 @@ class Denuncia <<entidad>> {
   fechaInstruccion
   articulosAplicados
 }
-
-note left of Denuncia
-  {RN-15: Atributo confirmatorio de revisión por oficial/jefe.}
-  {RN-16: Guardado bloqueado si no se completan todos los detalles.}
-end note
 
 class Alegacion <<entidad>> {
   fechaPresentacion
@@ -188,11 +170,6 @@ GrupoTrabajo *-- "1..*" TurnoTrabajo : planifica >
 Vehiculo *-- "1..*" Equipamiento : integra >
 Denuncia *-- "0..*" Alegacion : recibe >
 
-
-' 2ª Clase de enlace (Vehículo - TurnoTrabajo)
-Vehiculo "0..*" -- "0..*" TurnoTrabajo
-(Vehiculo, TurnoTrabajo) .. AsignacionTurnoVehiculo
-
 ' --- ASOCIACIONES SIMPLES Y CRUZADAS (--) ---
 GrupoTrabajo "1" -- "1..*" Policia : compuestoPor >
 TurnoTrabajo "1" -- "0..*" Denuncia : genera >
@@ -203,7 +180,7 @@ Oficial "1" -- "0..*" Denuncia : revisa >
 Jefe "1" -- "0..*" Denuncia : revisa >
 Policia "1" -- "0..*" TurnoTrabajo : realiza >
 
-Policia "1" -- "0..*" Arma : porta >
+Policia "1" -- "1" Arma : porta >
 (Policia,Arma) .. Registroarmeria
 
 @enduml

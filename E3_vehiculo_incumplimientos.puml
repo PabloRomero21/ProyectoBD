@@ -1,0 +1,39 @@
+@startuml
+hide methods
+object "v3 : Vehiculo" as v {
+  matricula = "1234-BCD"
+  tipoVehiculo = Furgón
+  fechaMatriculacion = 2018-02-10
+  fechaProximaITV = 2026-02-10
+  fechaProximaLimpieza = 2026-11-10
+  fechaProximoMantenimiento = 2026-12-01
+  fechaVencimientoSeguro = 2026-09-30
+}
+object "itv1 : RegistroITV" as itv { fechaYhora = 2024-02-08 10:00 }
+object "l1 : RegistroLimpieza" as l1 { fechaYhora = 2026-10-01 08:00 }
+object "l2 : RegistroLimpieza" as l2 { fechaYhora = 2026-10-20 08:00 }
+object "m1 : RegistroMantenimiento" as m1 { fechaYhora = 2026-08-10 09:00 }
+object "m2 : RegistroMantenimiento" as m2 { fechaYhora = 2026-10-15 09:00 }
+object "e1 : Equipamiento" as e1 { tipoMaterial = Alcoholimetro }
+object "e2 : Equipamiento" as e2 { tipoMaterial = MantasTermicas }
+
+v *-- itv : contiene
+v *-- l1 : contiene
+v *-- l2 : contiene
+v *-- m1 : contiene
+v *-- m2 : contiene
+v *-- e1 : integra
+v *-- e2 : integra
+
+note right of v
+  RN-05: ITV caducada (próxima 2026-02-10)
+  RN-06: seguro vencido
+  RN-07: falta desfibrilador
+end note
+note bottom of l2
+  RN-01: 19 días entre limpiezas
+end note
+note bottom of m2
+  RN-02: más de 1 mes entre mantenimientos
+end note
+@enduml
