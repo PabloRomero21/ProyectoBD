@@ -1,0 +1,75 @@
+@startuml
+hide methods
+skinparam classAttributeIconSize 0
+
+
+class Venta <<entidad>> {
+  total
+  fecha
+}
+
+class Lineaproducto <<entidad>>{
+    codigo
+    precioUnidad
+    cantidad
+}
+
+class producto <<entidad>>{
+    codigo
+    nombre
+    precioUnidad
+    stockDisponible
+}
+
+class ConReceta {
+    principioactivo
+    escontrolado
+}
+
+class SinReceta {
+    categoria
+    edadminima
+}
+
+class Distribuidora <<entidad>>{
+
+    NIF
+    nombre
+    direccion
+    telefono
+}
+
+class Precio <<entidad>>{
+    precio
+}
+
+class Receta<<entidad>>{
+    fechaEmision
+    cantidad
+    fechavalidez
+}
+
+class Cliente<<entidad>>{
+    nombre
+    Direccion
+    Telefono
+}
+
+' Relación de herencia (la flecha apunta al padre)
+producto <|-- ConReceta
+producto <|-- SinReceta
+' Restricción de herencia completa y disjunta
+note on link
+  {completa, disjunta}
+end note
+
+Cliente "1" -- "*" Venta
+Receta "*"-- "1" Cliente
+Receta "*" -- "1"ConReceta
+Venta *-- "1..*" Lineaproducto
+Lineaproducto "*" -- "1" producto
+Distribuidora "*" -- "*" producto
+(Distribuidora, producto) .. Precio
+Receta "0..1"--"1" Lineaproducto
+
+@enduml

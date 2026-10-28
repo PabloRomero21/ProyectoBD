@@ -1,0 +1,209 @@
+@startuml
+hide methods
+skinparam classAttributeIconSize 0
+
+' --- CLASES DE PERSONAL ---
+class Policia <<entidad>> {
+  numeroIdentificacion
+  horario
+  vacacionesDisponibles
+  diasAsuntosPropios
+  horasExtra
+  refuerzosMes
+  añosAntiguedad
+}
+
+class Jefe <<entidad>> {
+  fechaNombramiento
+}
+class Oficial <<entidad>> {
+  fechaNombramiento
+}
+
+Policia <|-- Jefe
+Policia <|-- Oficial
+
+note on link
+  {completa, disjunta}
+end note
+
+note left of Policia
+  {RN-03: Vacaciones exigen validación y aprobación del jefe.}
+  {RN-04: Asignación base de 7 días de asuntos propios.}
+  {RN-05: Días de asuntos propios aumentan por antigüedad.}
+end note
+
+' --- CLASES DE OPERATIVA Y TURNOS ---
+class GrupoTrabajo <<entidad>> {
+  nombre
+  zonaDistrito
+}
+
+
+note right of GrupoTrabajo
+  {RN-02: Mantener mínimo del 50% de ocupación operativa.}
+end note
+
+class TurnoTrabajo <<entidad>> {
+  fecha
+  tipoTurno
+
+}
+
+' 1. Definimos la enumeración con los tipos de turno
+enum tipoTurno {
+  Manana
+  Tarde
+  Noche
+}
+
+' 2. Conectamos la clase con el enum mediante una línea discontinua
+TurnoTrabajo ..> tipoTurno : especifica >
+
+note bottom of TurnoTrabajo
+  {RN-01: Ciclo inalterable de turnos: 7T-7D, 5T-5D, 2T-2D.}
+  {RN-06: Límite máximo de 5 noches de trabajo por policía.}
+end note
+
+' --- CLASES DE VEHÍCULOS Y MANTENIMIENTO ---
+class Vehiculo <<entidad>> {
+  matricula
+  tipoVehiculo
+  fechaProximaITV
+  fechaProximaLimpieza
+  fechaProximoMantenimiento
+}
+
+enum TipoVehiculo {
+  Moto
+  Coche
+  Furgon
+}
+
+' 2. Línea discontinua que conecta el Vehículo con sus posibles valores (Enumeración)
+Vehiculo ..> TipoVehiculo : define tipo >
+class Registroarmeria<<entidad>>{
+  fechayhoraRetirada
+  fechayhoraDevolucion
+}
+class RegistroITV <<entidad>>{
+
+}
+class RegistroLimpieza <<entidad>>{
+
+}
+class RegistroMantenimiento <<entidad>>{
+
+}
+
+class RegistroRevision <<entidad>>{}
+
+class RegistroPracticas <<entidad>>{}
+
+note left of Vehiculo
+  {RN-07: Limpieza estricta 1 vez a la semana.}
+  {RN-08: Mantenimiento mecánico 1 vez al mes.}
+  {RN-09: Control y registro obligatorio de ITV.}
+  {RN-10: Comprobación semanal de sistemas de emergencia.}
+  {RN-11: Mínimo 1 desfibrilador y 1 alcoholímetro asignado.}
+end note
+
+class Equipamiento <<entidad>> {
+  tipoMaterial
+  numeroSerie
+}
+
+' 1. Definimos la enumeración con todos tus materiales
+enum TipoMaterialEquipamiento {
+  Cono
+  Desfibrilador
+  Alcoholimetro
+  Vallas
+  EscudoAntidisturbios
+  CascoAntidisturbios
+  Linterna
+  Botiquin
+  MantasTermicas
+  Drogotest
+  CintaBalizamiento
+  Emisora
+}
+
+' 2. Conectamos la clase con el enum mediante una línea discontinua
+Equipamiento ..> TipoMaterialEquipamiento : especifica >
+
+class AsignacionTurnoVehiculo <<entidad>> {
+  kilometrosRecorridos
+  piloto
+  copiloto
+}
+' --- CLASES DE ARMERÍA ---
+class Arma <<entidad>> {
+  numeroSerie
+  numeroCajaAsignada
+  autorizacion
+  municionAsignada
+  fechaProximaPractica
+  fechaProximaRevision
+}
+
+note right of Arma
+  {RN-12: Mínimo 1 práctica de tiro registrada al año.}
+  {RN-13: Práctica llevada a cabo únicamente por policía asignado.}
+  {RN-14: Revisión técnica 1 vez al mes con técnico especializado.}
+end note
+
+
+
+' --- CLASES DE DENUNCIAS ---
+class Denuncia <<entidad>> {
+  fechaTramite
+  lugar
+  horaHecho
+  tieneFoto
+  cuantiaReiterada
+  viaEjecutivaPeriodo
+  revisada
+  fechaInstruccion
+  articulosAplicados
+}
+
+note left of Denuncia
+  {RN-15: Atributo confirmatorio de revisión por oficial/jefe.}
+  {RN-16: Guardado bloqueado si no se completan todos los detalles.}
+end note
+
+class Alegacion <<entidad>> {
+  fechaPresentacion
+  argumento
+}
+
+' --- RELACIONES DE COMPOSICIÓN (*--) ---
+Arma *-- "1..*" RegistroRevision : contiene >
+Arma *-- "1..*" RegistroPracticas : contiene >
+Vehiculo *-- "1..*" RegistroITV : contiene >
+Vehiculo *-- "1..*" RegistroLimpieza : contiene >
+Vehiculo *-- "1..*" RegistroMantenimiento : contiene >
+GrupoTrabajo *-- "1..*" TurnoTrabajo : planifica >
+Vehiculo *-- "1..*" Equipamiento : integra >
+Denuncia *-- "0..*" Alegacion : recibe >
+
+
+' 2ª Clase de enlace (Vehículo - TurnoTrabajo)
+Vehiculo "0..*" -- "0..*" TurnoTrabajo
+(Vehiculo, TurnoTrabajo) .. AsignacionTurnoVehiculo
+
+' --- ASOCIACIONES SIMPLES Y CRUZADAS (--) ---
+GrupoTrabajo "1" -- "1..*" Policia : compuestoPor >
+TurnoTrabajo "1" -- "0..*" Denuncia : genera >
+Oficial "1" -- "1" GrupoTrabajo : estaACargoDe >
+Jefe "1" -- "0..*" Policia : apruebaVacacionesYHorarios >
+Policia "1" -- "0..*" Denuncia : interpone >
+Oficial "1" -- "0..*" Denuncia : revisa >
+Jefe "1" -- "0..*" Denuncia : revisa >
+Policia "1" -- "0..*" TurnoTrabajo : realiza >
+
+Policia "1" -- "0..*" Arma : porta >
+(Policia,Arma) .. Registroarmeria
+
+@enduml
